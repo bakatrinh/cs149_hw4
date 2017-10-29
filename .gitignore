@@ -1,5 +1,8 @@
 !.mvn/wrapper/maven-wrapper.jar
 
+/bin/
+/temp/
+
 ### STS ###
 .apt_generated
 .classpath
@@ -19,3 +22,4 @@ nbbuild/
 dist/
 nbdist/
 .nb-gradle/
+/.metadata/

@@ -1,6 +1,9 @@
+package cs149_hw4;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
@@ -8,13 +11,15 @@ public class SetUp {
     final int PROCESS_TOTAL = 150;
     final int EACHRUNTIME = 60; //each run time 1 minute (=60sec)
 
-    List<Process> tempPcessList = new ArrayList<>();
-    List<Process> pcessList = new ArrayList<>();
+    LinkedList<Process> tempPcessList = new LinkedList<>();
+    LinkedList<Process> pcessList = new LinkedList<>();
     List<Integer> tempRandomProcessList = new ArrayList<>();
+    LinkedList<Page> freePagesList = new LinkedList<>();
+    LinkedList<Page> pageManagementList = new LinkedList<>();
 
 
     /*Generate work load: generate PROCESS_TOTAL processes <process name,Process size in pages,arrival time,service duration>*/
-    public List<Process> ProcessSetup() {
+    public LinkedList<Process> ProcessSetup() {
         Process p = new Process();
 
 		/*generate random number for process name, arrivalTime, processSize, and serviceDuration*/
@@ -64,10 +69,30 @@ public class SetUp {
                     tempPcessList.get(i).getArrivalTime(), tempPcessList.get(i).getServiceDuration()));
         }
 
-
         return pcessList;
 
     }//end of ProcessSetup
+
+
+    /*Create free pages linked list*/
+    public void freePagesSetup() {
+        Page pg = new Page();
+        final int FREEPAGEMAX = 100; //initially 100 free pages in memory. 1MB per page.
+        for (int i = 0; i < FREEPAGEMAX; i++) {
+            freePagesList.add(new Page(pg.getPageContent()));
+        }
+
+    }
+
+
+//	public LinkedList<Page> PageManagementSetup(){
+//		int free = 1; //if occupied by process => 0, if free memory => 1
+//		int startAddress = 0;
+//		/* Length of free or occupied memory.It depends on the 1st index: free = 1 or 0*/
+//		int length = 100; //length in page (1MB per page).  
+//		pageManagementList.add(new Page(free, startAddress, length));
+//		return pageManagementList;
+//	}
 
 }
 

@@ -1,3 +1,5 @@
+package cs149_hw4;
+
 import java.io.IOException;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
@@ -32,6 +34,9 @@ public class Main {
                 case 0:
                     inMenu = false;
                     scan.close();
+                    System.out.println("\n==============================");
+                    System.out.println("Program Done. Exiting.");
+                    System.out.println("==============================\n");
                     break;
 
                 case 1:

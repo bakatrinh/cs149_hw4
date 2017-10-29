@@ -1,5 +1,6 @@
+package cs149_hw4;
+
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -8,8 +9,15 @@ public class Process {
     private int processSize;
     private int serviceDuration;
     private String processName;
+    List<Integer> pageContent = new ArrayList<>();
 
     public Process() {
+    }
+
+    public Process(int ps, int aT, int sD) {
+        processSize = ps;
+        arrivalTime = aT;
+        serviceDuration = sD;
     }
 
     public Process(String n, int ps, int aT, int sD) {
@@ -36,6 +44,10 @@ public class Process {
         return processSize;
     }
 
+    public List getProcessPageContent() {
+        return pageContent;
+    }
+
     public String getProcessName() {
         return processName;
     }
@@ -52,7 +64,6 @@ public class Process {
 
     /*generate process size in pages 5, 11, 17, 31 MB*/
     public void setProcessSize(int randProcessNum) {
-
         int prSize = (randProcessNum % 4);
         switch (prSize) {
             case 0:
@@ -72,20 +83,29 @@ public class Process {
                 break;
         }
         processSize = prSize;
+//		setProcessPageContent(prSize);
+    }
+
+    public void setProcessPageContent(int size) {
+        Random rand = new Random(System.currentTimeMillis());
+        for (int i = 0; i < size; i++) {
+            pageContent.add(rand.nextInt(size));
+        }
     }
 
     /* convert process' names to official names: 26 upper letters, 26 lower letters, and numbers up to (150 - 26 - 26) processes*/
-    public void setProcessName(int randProcessNum) {
+    public void setProcessName(int i) {
         String names = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
         String convertToName;
-        if (randProcessNum >= 0 && randProcessNum <= 51) {
-            convertToName = names.substring(randProcessNum, randProcessNum + 1); //convert to A-Za-z
+        if (i >= 0 && i <= 51) {
+            convertToName = names.substring(i, i + 1); //convert to A-Za-z
         } else {
-            convertToName = Integer.toString(randProcessNum - 52); //1 to TOTALPROCESSES
+            convertToName = Integer.toString(i - 52); //1 to TOTALPROCESSES
         }
 
         processName = convertToName;
     }
+
 
 }
