@@ -1,5 +1,3 @@
-out/
-target/
 !.mvn/wrapper/maven-wrapper.jar
 
 ### STS ###
@@ -10,11 +8,9 @@ target/
 .settings
 .springBeans
 
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
+out/
+target/
+*.class
 
 ### NetBeans ###
 nbproject/private/
