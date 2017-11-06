@@ -9,7 +9,7 @@ public class Main {
 
     public static void main(String[] args) throws IOException, InterruptedException {
     	// SetUp su = new SetUp();
- 		//su.setFreePageList(1);//set up the Free page list for the very first time	
+ 	//	su.setFreePageList(1);//set up the Free page list for the very first time	
  	//	System.out.println("free page list: "+su.GetFreePageList().size());
 		PagingSwapping ps = new PagingSwapping();
 		
@@ -28,7 +28,7 @@ public class Main {
                 System.out.println("5. Generate 5 runs random pick");
                 System.out.println("0. Exit");
                 System.out.println();
-                System.out.print("Please enter a choice: ");
+                System.out.print("Please enter a choice:\n ");
                 try {
                     menuChoice = scan.nextInt();
                     ps.getMenuSelection(menuChoice);
@@ -66,7 +66,7 @@ public class Main {
                     random();
                     break;
             }
-        }
+       }
     }
     
 
@@ -124,11 +124,8 @@ public class Main {
         System.out.println("==============================\n");
 
         // Your code goes here
-//        ProcessSimulation sim = new ProcessSimulation();
-//        sim.Simulation();
-       
-        PagingSwapping ps = new PagingSwapping();
-        ps.start();
+        ProcessSimulation sim = new ProcessSimulation();
+        sim.Simulation();
         
 
         System.out.println("\n==============================");

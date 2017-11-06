@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Random;
 
 public class SetUp {
-	final int PROCESS_TOTAL = 10;
+	final int PROCESS_TOTAL = 150;
 	final int EACHRUNTIME = 60; //each run time 1 minute (=60sec)
 	
 	LinkedList<Process> tempPcessList = new LinkedList<>();
@@ -84,20 +84,6 @@ public class SetUp {
 	public LinkedList<Integer> getFreePageList(){
 		return freePgList;
 	}
-	
-	/* set a page of free page list to free or occupied*/
-//	public LinkedList<Integer> setAPage(int index, int flag){
-//		/* flag = 1 -> set page to free.  flag=0 -> set page to occupied */
-//		freePgList.set(index, flag); 
-//		return freePgList;
-//	}
-	
-	/* Linkedlist to keep track pages in memory for each process. */
-//	public LinkedList<Page> eachProcessPagesInMem(String processName, int pgNum){
-//		/* add process name and page to the list */
-//		process.add(new Page(processName, pgNum));
-//		return process;
-//	}
 	
 }
 
