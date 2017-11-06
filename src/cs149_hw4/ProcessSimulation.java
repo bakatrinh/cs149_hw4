@@ -6,60 +6,42 @@ import java.util.List;
 
 public class ProcessSimulation {
 	
-	LinkedList<Integer> freePageList = new LinkedList<>();//Free Page list
+	LinkedList<Integer> freePgList = new LinkedList<>();//Free Page list
+	LinkedList<Process> processList = new LinkedList<>();
 	
-	public void Simulation(){
+
+	public void Simulation() {
 		PagingSwapping ps = new PagingSwapping();
 		
 		/*to be List of threads*/
-	//	List<PagingSwapping> threads = new ArrayList<>();
+		List<PagingSwapping> obj = new ArrayList<>();
 		
-		freePageList = ps.getFreePgList();
+//		freePgList = ps.getFreePgList();
+//		processList = ps.getProcessList();
 		
+//		ps.start();
 		/*Initially, the process starts when there are at least 4 free pages in the Free page list.
 		*Each process takes at least 4 pages memory to begin .Initially 25 processes start concurrently*/
 		for(int i=0; i<25; i++){
-			int count=0;
-			int index = 0;
-			while (count<4 && index<100){
-				if(isPageFree(index) == 1){
-					count++;
-				}
-				index++;
-			}
-			if(count>=4){
-				ps.start();
-//				threads.add(ps);//collect threads
-			}
+			PagingSwapping psw = new PagingSwapping();
+			obj.add(psw);
 		}
 		
 		
-//		int count=0;
-//		for (Process a:processList){
-//			System.out.println(a + " ");
-//			count++;
-//		}
-//		System.out.println("count: "+count);
-//	
-//	}
+	
+//		int i=0;
+//		while((freePgList.size() >= 4) && !processList.isEmpty() && i<25){
 		
 		
-	}//end of Simulation
-	
-	
-	
-	
-	public int isPageFree (int index){
-		/*if there is free page, return 1.  Otherwise, return 0*/
-		if(freePageList.get(index) == 1){
-			return 1;
+		for(int i=0; i<25; i++){
+			obj.get(i).start();
+		
 		}
-		return 0;
-	}
+		
 
-} //end class ProcessSimulation
+	} //end class ProcessSimulation
 	
-	
+}	
 	
 	
 	

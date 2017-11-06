@@ -8,14 +8,14 @@ import java.util.List;
 import java.util.Random;
 
 public class SetUp {
-	final int PROCESS_TOTAL = 150;
+	final int PROCESS_TOTAL = 10;
 	final int EACHRUNTIME = 60; //each run time 1 minute (=60sec)
 	
 	LinkedList<Process> tempPcessList = new LinkedList<>();
 	LinkedList<Process> pcessList = new LinkedList<>();//list of all processes with name,pagesize,arrtime,serviceduration
 	List<Integer>tempRandomProcessList = new ArrayList<>();
 	LinkedList<Integer> freePgList = new LinkedList<>();//Free Page list
-	LinkedList<Page> process = new LinkedList<>();//to keep track pages in memory for each process
+//	LinkedList<Page> process = new LinkedList<>();//to keep track pages in memory for each process
 	
 	
 	/*Generate work load: generate PROCESS_TOTAL processes <process name,Process size in pages,arrival time,service duration>*/
@@ -75,47 +75,28 @@ public class SetUp {
 	
 	
 	/*Create Free Page linked list*/
-	public void setFreePageList(int flag){
+	public void setFreePageList(){
 		for(int i=0; i<100; i++){
-			freePgList.add(flag);  //Initially, all 100 pages are free: free=1, used=0
+			freePgList.add(1);  //Initially, there are 100 pages
 		}
 	}
 	
-	public LinkedList<Integer> GetFreePageList(){
+	public LinkedList<Integer> getFreePageList(){
 		return freePgList;
 	}
 	
 	/* set a page of free page list to free or occupied*/
-	public LinkedList<Integer> setAPage(int index, int flag){
-		/* flag = 1 -> set page to free.  flag=0 -> set page to occupied */
-		freePgList.set(index, flag); 
-		return freePgList;
-	}
+//	public LinkedList<Integer> setAPage(int index, int flag){
+//		/* flag = 1 -> set page to free.  flag=0 -> set page to occupied */
+//		freePgList.set(index, flag); 
+//		return freePgList;
+//	}
 	
 	/* Linkedlist to keep track pages in memory for each process. */
-	public LinkedList<Page> eachProcessPagesInMem(int pgNum){
-		/* add process name and page to the list */
-		process.add(new Page(pgNum));
-		return process;
-	}
-	
-	
-//	public List<Page> PageManagementSetup(){
-//		Page pg = new Page();
-//		 
-//		for(int i=0; i<100; i += 4){  //100 free pages max in memory. 1MB per page.
-//			pg.setMemoryStatus(1); //Initially is free. If occupied => 0, if free memory => 1
-//			
-//			pg.setStartAtPageAddress(i);
-//			
-//			/* Length of free or occupied memory.It depends on the 1st index: free=1 or occupied=0*/
-//			pg.setLength(4); //length in page (1MB per page). 
-//			
-//			pageManagementList.add(new Page(pg.getMemoryStatus(),pg.getStartAtPageAddress(),pg.getLength()));
-//		}
-//		
-//		
-//		return pageManagementList;
+//	public LinkedList<Page> eachProcessPagesInMem(String processName, int pgNum){
+//		/* add process name and page to the list */
+//		process.add(new Page(processName, pgNum));
+//		return process;
 //	}
 	
 }

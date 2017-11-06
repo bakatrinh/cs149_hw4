@@ -8,8 +8,11 @@ import java.util.Scanner;
 public class Main {
 
     public static void main(String[] args) throws IOException, InterruptedException {
-    	SetUp su = new SetUp();
-		su.setFreePageList(1);//set up at the very first time for Free page list to be all free (=1)
+    	// SetUp su = new SetUp();
+ 		//su.setFreePageList(1);//set up the Free page list for the very first time	
+ 	//	System.out.println("free page list: "+su.GetFreePageList().size());
+		PagingSwapping ps = new PagingSwapping();
+		
         Scanner scan = new Scanner(System.in);
         clearScreen();
         boolean inMenu = true;
@@ -28,6 +31,7 @@ public class Main {
                 System.out.print("Please enter a choice: ");
                 try {
                     menuChoice = scan.nextInt();
+                    ps.getMenuSelection(menuChoice);
                 } catch (NoSuchElementException e) {
                     scan.next();
                 }
@@ -58,12 +62,13 @@ public class Main {
                     mfu();
                     break;
 
-                case 5:
+                default:
                     random();
                     break;
             }
         }
     }
+    
 
     public static void fifo() {
         System.out.println("\n==============================");
@@ -113,12 +118,18 @@ public class Main {
         System.out.println("==============================\n");
     }
 
-    public static void random() {
+    public static void random() throws InterruptedException {
         System.out.println("\n==============================");
         System.out.println("Random");
         System.out.println("==============================\n");
 
         // Your code goes here
+//        ProcessSimulation sim = new ProcessSimulation();
+//        sim.Simulation();
+       
+        PagingSwapping ps = new PagingSwapping();
+        ps.start();
+        
 
         System.out.println("\n==============================");
         System.out.println("Random Done");
