@@ -141,7 +141,7 @@ public class PagingSwapping implements Runnable{
 							
 							 /*Update "recently use" so it can be used in lru() */
 	//						 int rUse = allProcessPages.get(i).getRecentlyUse();//need to refine this
-							allProcessPages.get(procIndexLocal).setRecentlyUse(++recentUsed);
+							allProcessPages.get(i).setRecentlyUse(++recentUsed);
 							
 							//add a new page number to the global "all process" list
 							 addNewPageToAllProcessPageList(prName,pageInMem, getTimeStampToPrint(),
