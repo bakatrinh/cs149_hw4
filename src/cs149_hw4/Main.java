@@ -82,12 +82,16 @@ public class Main {
         System.out.println("==============================\n");
     }
 
-    public static void lru(int menuChoice) {
+    public static void lru(int menuChoice) throws InterruptedException {
         System.out.println("\n==============================");
         System.out.println("LRU");
         System.out.println("==============================\n");
 
         // Your code goes here
+        
+        ProcessSimulation processSimulation = new ProcessSimulation();
+        processSimulation.Simulation(menuChoice);
+
 
         System.out.println("\n==============================");
         System.out.println("LRU Done");

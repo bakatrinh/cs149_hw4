@@ -22,6 +22,7 @@ public class PagingSwapping implements Runnable{
 	private int selection;
 	private int isEvicted;
 	private Timer timer;
+	private int recentUsed = 0;
 	
 	/*Constructor*/
 	public PagingSwapping(Timer timer){
@@ -72,7 +73,7 @@ public class PagingSwapping implements Runnable{
 	//			int recentlyUse = 1; //when process starts, set recentlyUse of page 0 to 1.
 				
 				/*Add processName, the 1st page number (page 0), timeStamp, and freqUse to the "global" allProcessPages list*/
-				allProcessPages.add(new Page(procName,pageNum, timeStamp, timeStampToCompu, freqUse));
+				allProcessPages.add(new Page(procName,pageNum, timeStamp, timeStampToCompu, freqUse,++recentUsed));
 				
 				/*add page 0, process name, process size, and serviceDuration to its process list so the 
 				 * process doesn't need to access to global(shared) variables when it runs => processes can run parallel*/
@@ -140,6 +141,7 @@ public class PagingSwapping implements Runnable{
 							
 							 /*Update "recently use" so it can be used in lru() */
 	//						 int rUse = allProcessPages.get(i).getRecentlyUse();//need to refine this
+							allProcessPages.get(i).setRecentlyUse(++recentUsed);
 							
 							//add a new page number to the global "all process" list
 							 addNewPageToAllProcessPageList(prName,pageInMem, getTimeStampToPrint(),
@@ -385,6 +387,20 @@ public class PagingSwapping implements Runnable{
 	}
 	
 	public LinkedList<Page>lru(){
+		int min =0;
+		
+		for (Page p : allProcessPages) {
+			if(min >= p.getRecentlyUse()){
+				min = p.getRecentlyUse();
+				evictItemList.clear();;
+				evictItemList.add(p);
+			}
+		}
+		for (int i = 0; i < procPageInMem.size(); i++) {
+			if (procPageInMem.get(i).getProcName().equals(evictItemList.get(0).getProcName())
+					&& procPageInMem.get(i).getPageNumber() == evictItemList.get(0).getPageNumber())
+				procPageInMem.remove(i);
+		}
 		return evictItemList;
 	}
 	
