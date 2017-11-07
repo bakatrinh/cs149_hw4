@@ -1,6 +1,8 @@
-package cs149_homework4;
+package cs149_hw4;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
@@ -8,8 +10,6 @@ import java.util.Scanner;
 public class Main {
 
     public static void main(String[] args) throws IOException, InterruptedException {
-
-		PagingSwapping ps = new PagingSwapping();
 		
         Scanner scan = new Scanner(System.in);
         clearScreen();
@@ -29,7 +29,6 @@ public class Main {
                 System.out.print("Please enter a choice:\n ");
                 try {
                     menuChoice = scan.nextInt();
-                    ps.getMenuSelection(menuChoice);
                 } catch (NoSuchElementException e) {
                     scan.next();
                 }
@@ -45,23 +44,23 @@ public class Main {
                     break;
 
                 case 1:
-                    fifo();
+                    fifo(menuChoice);
                     break;
 
                 case 2:
-                    lru();
+                    lru(menuChoice);
                     break;
 
                 case 3:
-                    lfu();
+                    lfu(menuChoice);
                     break;
 
                 case 4:
-                    mfu();
+                    mfu(menuChoice);
                     break;
 
                 default:
-                    random();
+                    random(menuChoice);
                     break;
             }
        }
@@ -69,7 +68,7 @@ public class Main {
     
     
 
-    public static void fifo() {
+    public static void fifo(int menuChoice) {
         System.out.println("\n==============================");
         System.out.println("FIFO");
         System.out.println("==============================\n");
@@ -81,7 +80,7 @@ public class Main {
         System.out.println("==============================\n");
     }
 
-    public static void lru() {
+    public static void lru(int menuChoice) {
         System.out.println("\n==============================");
         System.out.println("LRU");
         System.out.println("==============================\n");
@@ -93,7 +92,7 @@ public class Main {
         System.out.println("==============================\n");
     }
 
-    public static void lfu() {
+    public static void lfu(int menuChoice) {
         System.out.println("\n==============================");
         System.out.println("LFU");
         System.out.println("==============================\n");
@@ -105,26 +104,26 @@ public class Main {
         System.out.println("==============================\n");
     }
 
-    public static void mfu() {
+    public static void mfu(int menuChoice) throws InterruptedException {
         System.out.println("\n==============================");
         System.out.println("MFU");
         System.out.println("==============================\n");
 
-        // Your code goes here
+        ProcessSimulation sim = new ProcessSimulation();
+        sim.Simulation(menuChoice);
 
         System.out.println("\n==============================");
         System.out.println("MFU Done");
         System.out.println("==============================\n");
     }
 
-    public static void random() throws InterruptedException {
+    public static void random(int menuChoice) throws InterruptedException {
         System.out.println("\n==============================");
         System.out.println("Random");
         System.out.println("==============================\n");
 
-        // Your code goes here
         ProcessSimulation sim = new ProcessSimulation();
-        sim.Simulation();
+        sim.Simulation(menuChoice);
         
 
         System.out.println("\n==============================");
@@ -142,5 +141,4 @@ public class Main {
             System.out.flush();
         }
     }
-    // this is a comment
 }

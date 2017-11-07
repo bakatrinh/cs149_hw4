@@ -1,4 +1,4 @@
-package cs149_homework4;
+package cs149_hw4;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -21,16 +21,17 @@ public class PagingSwapping implements Runnable{
 	private int serDuration;
 	private int selection;
 	private int isEvicted;
-	
+	private Timer timer;
 	
 	/*Constructor*/
-	public PagingSwapping(){
+	public PagingSwapping(Timer timer){
 		SetUp su = new SetUp();
 		processList = su.ProcessSetup();
 		freePageList = su.getFreePageList();
 		for(int i=0; i<25; i++){
 			freePageList.add(1);  //Initially, there are 100 pages
 		}
+		this.timer = timer;
 		isEvicted=0;
 		System.out.println("\nTry");
 	}
@@ -39,14 +40,12 @@ public class PagingSwapping implements Runnable{
 	public void run(){
 		lock.lock();
 		try {
-			while(!processList.isEmpty()){
+			while(!processList.isEmpty() && timer.getCurrent() < 60.01){
 				referenceAndSwap(FirstPageInMem(0));
 			}
-			System.out.println("\nAll processes are done");
-			
 		} catch (InterruptedException e) {
 			e.printStackTrace();
-		}finally{
+		} finally {
 			lock.unlock();
 		}
 	}
@@ -105,8 +104,6 @@ public class PagingSwapping implements Runnable{
 	
 	/*Continue to reference and swap pages until process completes or suspends*/
 	public void referenceAndSwap(int procInd) throws InterruptedException{
-		lock.lock();
-		try{
 		int procIndexLocal = procInd;
 		// there is no evicted page
 		
@@ -171,9 +168,6 @@ public class PagingSwapping implements Runnable{
 		else{ //if process started but there is no memory, steal a page and starts "FirstPageInMem" again (start process again)
 			isEvicted = evictProcedure();
 		}
-		}finally{
-			lock.unlock();
-		}
 	}
 	
 	
@@ -208,7 +202,7 @@ public class PagingSwapping implements Runnable{
     }
 	
 	public int evictProcedure(){
-		evictItemList = stealPage(5);
+		evictItemList = stealPage(selection);
 	    int isEvict = 1;//page evicted
 		updateFreePageList("+");
 		return isEvict;
@@ -219,10 +213,10 @@ public class PagingSwapping implements Runnable{
 	public LinkedList<Page> stealPage(int choice){
 		switch (choice){
 			 case 0: 	break;
-			 case 1: 	fifo(); break;	
-	         case 2: 	lru();  break;
-	         case 3: 	lfu();  break;
-	         case 4: 	mfu();  break;
+			 case 1: 	evictItemList = fifo(); break;	
+	         case 2: 	evictItemList = lru();  break;
+	         case 3: 	evictItemList = lfu();  break;
+	         case 4: 	evictItemList = mfu();  break;
 	         default:	evictItemList = Random(); break;
 		}
 		return evictItemList;
@@ -350,14 +344,11 @@ public class PagingSwapping implements Runnable{
 	
 	/*Return a string time stamp for print out*/
 	public String getTimeStampToPrint(){
-		Date instant = new Date(System.currentTimeMillis());
-		SimpleDateFormat sdf = new SimpleDateFormat( "ss" );
-		String time = sdf.format( instant );
-		return time;
+		return timer.getCurrentString();
 	}
 	
 	public void printColTittle(){
-		System.out.println("\nTime-stamp	  Process name		       Page-referenced		Page-in-memory"
+		System.out.println("\nTimestamp	  Process name		       Page-referenced		Page-in-memory"
 							+ "			   Process/Page-evicted\n");
 	}
 	
@@ -376,20 +367,34 @@ public class PagingSwapping implements Runnable{
 		return processList;
 	}
 	
-	public void fifo(){
-		
+	public LinkedList<Page>fifo(){
+		return evictItemList;
 	}
 	
-	public void  lru(){
-		
+	public LinkedList<Page>lru(){
+		return evictItemList;
 	}
 	
-	public void  lfu(){
-		
+	public LinkedList<Page> lfu(){
+		return evictItemList;
 	}
 	
-	public void  mfu(){
+	public LinkedList<Page> mfu(){
+		/*steal 1 page for process to continue*/
+		int rand = RandomNumberGenerator(0, allProcessPages.size()-1);
+		evictItemList.add(allProcessPages.get(rand));
+		/*remove a page from memory (allProcessPages list)*/
+		allProcessPages.remove(rand);
 		
+		/*remove a page from memory (procPageInMem list) */
+		for(int i=0; i<procPageInMem.size(); i++){
+			if(procPageInMem.get(i).getProcName().equals(evictItemList.get(0).getProcName()) 
+					&& procPageInMem.get(i).getPageNumber() == evictItemList.get(0).getPageNumber()){
+				procPageInMem.remove(i);
+			}
+		}
+		
+		return evictItemList; //return an evicted page
 	}
 	
 	public LinkedList<Page> Random() {
@@ -409,7 +414,6 @@ public class PagingSwapping implements Runnable{
 		
 		return evictItemList; //return an evicted page
 	}
-	
 }
 
 

@@ -1,4 +1,4 @@
-package cs149_homework4;
+package cs149_hw4;
 
 import java.util.LinkedList;
 
