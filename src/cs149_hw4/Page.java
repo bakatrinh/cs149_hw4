@@ -37,6 +37,15 @@ public class Page {
 //		recentlyUse = rUse;
 	}
 	
+	public Page(String pname, int pNum, String tstamp, long timeComp, int fUse, int rUse){
+		processName = pname;
+		pgNumber=pNum;
+		timeStamp = tstamp;
+		timeStampToCompute = timeComp;
+		freqUse = fUse;
+		recentlyUse = rUse;
+	}
+	
 	/*Get methods*/
 	public int getPageNumber(){return pgNumber;}
 	public int getProcSize(){ return processSize;}
