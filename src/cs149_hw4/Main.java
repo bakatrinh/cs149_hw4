@@ -1,4 +1,4 @@
-package cs149_hw4;
+package cs149_homework4;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -8,9 +8,7 @@ import java.util.Scanner;
 public class Main {
 
     public static void main(String[] args) throws IOException, InterruptedException {
-    	// SetUp su = new SetUp();
- 	//	su.setFreePageList(1);//set up the Free page list for the very first time	
- 	//	System.out.println("free page list: "+su.GetFreePageList().size());
+
 		PagingSwapping ps = new PagingSwapping();
 		
         Scanner scan = new Scanner(System.in);
@@ -68,6 +66,7 @@ public class Main {
             }
        }
     }
+    
     
 
     public static void fifo() {

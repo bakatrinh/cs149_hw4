@@ -1,4 +1,4 @@
-package cs149_hw4;
+package cs149_homework4;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -14,11 +14,13 @@ public class PagingSwapping implements Runnable{
 	LinkedList<Page> procPageInMem = new LinkedList<>();//keep track pages in memory for each process
 	LinkedList<LinkedList<Page>> allProcessInMemList = new LinkedList<>();//keep all of the above "procPageInMem" list.  
 																			//Use this to call individual "procPageInMem" list
+	LinkedList<Page> evictItemList = new LinkedList<>();
 	
 	private String procName;
 	private int procSize;
 	private int serDuration;
 	private int selection;
+	private int isEvicted;
 	
 	
 	/*Constructor*/
@@ -26,9 +28,11 @@ public class PagingSwapping implements Runnable{
 		SetUp su = new SetUp();
 		processList = su.ProcessSetup();
 		freePageList = su.getFreePageList();
-		for(int i=0; i<100; i++){
+		for(int i=0; i<25; i++){
 			freePageList.add(1);  //Initially, there are 100 pages
 		}
+		isEvicted=0;
+		System.out.println("\nTry");
 	}
 	
 	
@@ -37,25 +41,23 @@ public class PagingSwapping implements Runnable{
 		try {
 			while(!processList.isEmpty()){
 				referenceAndSwap(FirstPageInMem(0));
-			}		
+			}
+			System.out.println("\nAll processes are done");
+			
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}finally{
 			lock.unlock();
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
 		}
 	}
 	
 	/* This method is to generate and keeping tract all activities when a process starts */
 	public int FirstPageInMem(int pageNum) throws InterruptedException{
 		/*Print title*/
-		printColTittle();
+		if(isEvicted == 0){
+			printColTittle();
+		}
 		
-
 		lock.lock();
 		try{
 			if(freePageList.size()>0){
@@ -81,9 +83,13 @@ public class PagingSwapping implements Runnable{
 				int processIndex = allProcessInMemList.size()-1;//index of "allProcessInMemList" and "allProcessPages"
 				
 				/*print content*/
-				String pEvict = "none";
+				if(isEvicted == 0){
+					evictItemList.add(new Page("none ", 0));	
+				}
+				String pEvict1 = evictItemList.getLast().getProcName();
+				int pEvict2 = evictItemList.getLast().getPageNumber();
+				String pEvict = pEvict1 +"/"+ String.valueOf(pEvict2);
 				printContent(timeStamp, procName, pageNum, pageNum, pEvict);
-				Thread.sleep(100);
 				
 				/*first time process runs, subtract 1 page from freePageList*/
 				updateFreePageList("-");
@@ -102,35 +108,33 @@ public class PagingSwapping implements Runnable{
 		lock.lock();
 		try{
 		int procIndexLocal = procInd;
-		int isEvicted = 0;// there is no evicted page
-		LinkedList<Page> evictedItem = new LinkedList<>();
+		// there is no evicted page
 		
-		if(procIndexLocal != -1){ //while there is free memory and process already started
+		if(procIndexLocal != -1){ //if there is free memory and process already started
 		
 			int pageInMem = 0; //initially, pageInMem=0 since page 0 is in memory after "FirstPageInMem" completed
 			int pageCount = 1; // 1 page (page 0) already is in memory
 			int pageInMemTemp;
-				int i = 0;
-				Thread.sleep(100);
-				if(procPageInMem.size() > 0){
-					i = procPageInMem.size()-1;
-				}
-				int prSize = allProcessInMemList.get(procIndexLocal).get(i).getProcSize();//get process size
-				String prName = allProcessInMemList.get(procIndexLocal).get(i).getProcName();//get process name
-				int serDuration = allProcessInMemList.get(procIndexLocal).get(i).getServiceDuration();//get service duration		
-				long startProcess = allProcessPages.get(i-1).getTimeStampToCompute();//time starts in "FirstPageInMem()"
-				while(pageCount < prSize){
-					Thread.sleep(100);
-					long startEachPage = getTimeStampToCompute();
-					String timeStamp = getTimeStampToPrint();
-					int processDuration = (int)(startEachPage - startProcess);
+				int i = allProcessInMemList.size()-1;
+				int j = procPageInMem.size() -1;
 					
-					if( processDuration < (serDuration*1000)){
+				int prSize = allProcessInMemList.get(i).get(j).getProcSize();//get process size
+				String prName = allProcessInMemList.get(i).get(j).getProcName();//get process name
+				int serDuration = allProcessInMemList.get(i).get(j).getServiceDuration();//get service duration		
+				
+				long startProcess = allProcessPages.get(allProcessPages.size()-1).getTimeStampToCompute();//time starts in "FirstPageInMem()"
+				long startEachPage = getTimeStampToCompute();
+				String timeStamp = getTimeStampToPrint();
+				int processDuration = (int)(startEachPage - startProcess);
+				
+				/*Cycle through all the pages of 1 process*/
+				while(pageCount < prSize && processDuration < (serDuration*1000)){
+					Thread.sleep(100);
 						if(freePageList.size() > 0){
 							if(isEvicted == 0){
-								evictedItem.add(new Page("none ", 0));	
+								evictItemList.add(new Page("none ", 0));	
 							}
-							pageInMemTemp= nextReferencePage(pageInMem, prSize, prName, evictedItem, timeStamp);
+							pageInMemTemp= nextReferencePage(pageInMem, prSize, prName, evictItemList, timeStamp);
 							pageInMem = pageInMemTemp;
 							
 							updateFreePageList("-");//subtract 1 page from FreePageList
@@ -143,29 +147,30 @@ public class PagingSwapping implements Runnable{
 							//add a new page number to the global "all process" list
 							 addNewPageToAllProcessPageList(prName,pageInMem, getTimeStampToPrint(),
 														getTimeStampToCompute()); 
-							pageCount++;
+							 isEvicted = 0;
+							 pageCount++;
+							 /*Get time for the next page*/
+							 startEachPage = getTimeStampToCompute();
+							 timeStamp = getTimeStampToPrint();
+							 /*total time spends so far*/
+							 processDuration += (int)(startEachPage - startProcess);
 							
 						}
 						else{ //no more free memory
-							evictedItem.clear();
-							evictedItem = stealPage(selection);
-							isEvicted = 1;//page evicted
-							updateFreePageList("+");
+							isEvicted = evictProcedure();
 						}
-					}
-					else{//if reach service duration limit
-	
-						/*print process finish*/
-						System.out.println("\n*-----Process reached service duration time");
-						Thread.sleep(100);
-						break;
-					}
-				
-				}//end of loop
-			
-			}//end of if 
-			
-			removeProcess(procIndexLocal, allProcessPages, allProcessInMemList, procPageInMem, freePageList); //process done
+					} //end of while loop
+				if(processDuration > (serDuration*1000)){
+					System.out.println("\n*-----Process reached service duration time limit");
+				}
+				else{
+					System.out.println("\nProcess completed");
+					removeProcess(procIndexLocal, allProcessPages, allProcessInMemList, procPageInMem, freePageList);
+				}
+		}//end of outer if.  Process either finished or reached service time limit
+		else{ //if process started but there is no memory, steal a page and starts "FirstPageInMem" again (start process again)
+			isEvicted = evictProcedure();
+		}
 		}finally{
 			lock.unlock();
 		}
@@ -176,48 +181,51 @@ public class PagingSwapping implements Runnable{
 	 public int nextReferencePage(int pgNum, int prcSize, String prcName, LinkedList<Page> evictP, String time) throws InterruptedException{
 			int pgNumTemp = pgNum; 
 			int yes=1; //yes=1 if page is in memory. Otherwise is 0. pgNum is current page so it's already in memory
+			int size = prcSize-1;
 			int r = RandomNumberGenerator(0,10);
 			if(r<7){ //case1: 0<= r <7 		
-				while((yes ==1) || (pgNumTemp > (prcSize-1))){//while page already in mem and pg num > process size
-					pgNumTemp = computeTempPgNumForFirstCase(pgNumTemp);
+				while(yes ==1){//while page already in mem
+					pgNumTemp = computeTempPgNumForFirstCase(pgNumTemp,size);
 					yes = isPageInMem(pgNumTemp, prcName, evictP, time);
-					Thread.sleep(100);
 				}
 				pgNum = pgNumTemp;
 			}
 			else{ //case2: 7<= r <=10
-				while((yes==1) || (pgNumTemp > (prcSize-1))){//while page is already in mem or pg num > process size
-					pgNumTemp = computeTempPgNumForSecondCase(pgNumTemp);
+				while(yes==1){//while page is already in mem
+					pgNumTemp = computeTempPgNumForSecondCase(pgNumTemp, size);
 					yes = isPageInMem(pgNumTemp, prcName, evictP, time);
 				}
 				pgNum = pgNumTemp;			 
 			}
 
-			/*print content*/
-			String ev = evictP.get(0).getProcName()+"/"+evictP.get(0).getPageNumber();
-			printContent(time, prcName, pgNum, pgNum, ev);
-			Thread.sleep(100);
 			return pgNum;
 		}
 		
 	
 	/* Get the menuChoice from Main class*/
-	public void getMenuSelection(int sel){
-		selection = sel;
+	public void getMenuSelection(int mChoice){
+		selection = mChoice;
     }
+	
+	public int evictProcedure(){
+		evictItemList = stealPage(5);
+	    int isEvict = 1;//page evicted
+		updateFreePageList("+");
+		return isEvict;
+	}
+	
 	
 	/*StealPage happens when no more free memory*/
 	public LinkedList<Page> stealPage(int choice){
-		LinkedList<Page> evictItem = new LinkedList<>();
 		switch (choice){
 			 case 0: 	break;
 			 case 1: 	fifo(); break;	
 	         case 2: 	lru();  break;
 	         case 3: 	lfu();  break;
 	         case 4: 	mfu();  break;
-	         default:	evictItem = random(); break;
+	         default:	evictItemList = Random(); break;
 		}
-		return evictItem;
+		return evictItemList;
 	}	
 	
 	public void updateFreePageList(String change){
@@ -240,22 +248,21 @@ public class PagingSwapping implements Runnable{
 	
 	 /* if page is in memory, return 1, otherwise return 0*/
 	 public int isPageInMem(int pgNum, String prName, LinkedList<Page> pEvict, String time) throws InterruptedException{
-		 LinkedList<Page> temp = new LinkedList<>();
-		 int i =0;	
+		 LinkedList<Page> temp = new LinkedList<>();	
 		 lock.lock();
 		try{
-			 /*Print content of all pages in memory of this process*/
-			 while(i < allProcessPages.size()){ 
+			 /*Print content of all pages in memory that referenced*/
+			 for(int i=0; i < allProcessPages.size(); i++){ 
 				 if(allProcessPages.get(i).getProcName().equals(prName)){
-					 String ev = pEvict.get(0).getProcName()+"/"+pEvict.get(0).getPageNumber();
+					 String pEvict1 = pEvict.getLast().getProcName();
+					 int pEvict2 = pEvict.getLast().getPageNumber();
+					 String ev = pEvict1 +"/"+ String.valueOf(pEvict2);
 					 printContent(time, prName, pgNum, allProcessPages.get(i).getPageNumber(), ev);
 				 }
-				 i++;
-			 }
-			 int j=0;
-			 while(j < allProcessPages.size()){ 
-				 if(allProcessPages.get(j).getProcName().equals(prName) 
-						 && (allProcessPages.get(j).getPageNumber() == pgNum)){
+			 }//end of loop of i
+			 
+			 for(int j=0; j < allProcessPages.size(); j++){ 
+				 if(allProcessPages.get(j).getProcName().equals(prName) && (allProcessPages.get(j).getPageNumber() == pgNum)){
 		 
 					 /*Update "frequency use" so it can be used in lfu() and mfu() */
 					 int freqUsage = allProcessPages.get(j).getFreqUse() +1 ;		 
@@ -265,8 +272,8 @@ public class PagingSwapping implements Runnable{
 					 
 					 return 1; //page is in memory
 				 }
-				 j++;
-			 }
+			 }//end for loop of j
+			 
 			 } finally {
 			 lock.unlock();
 		 }
@@ -277,19 +284,15 @@ public class PagingSwapping implements Runnable{
 				LinkedList<Page> proPageInMem, LinkedList<Integer> freePgList){
 		 lock.lock();
 		 try{
-			 allProInMemList.remove(index);	
-			 String prName = proPageInMem.get(0).getProcName();
+			
+			 String prName = allProInMemList.get(index).get(0).getProcName();
 			 for(int i=0; i<allProPages.size(); i++){
 				 if(allProPages.get(i).getProcName().equals(prName)){
 					 allProPages.remove(i);
-					 try {
-						Thread.sleep(100);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
 					 freePgList.add(1);
 				 }
 			 }
+			 allProInMemList.remove(index);	
 			
 		 }finally{
 			 lock.unlock();
@@ -298,7 +301,7 @@ public class PagingSwapping implements Runnable{
 	
 	
 	
-	/*-- Helpers: -------------------------*/
+	/*-- Helpers: ------------------------------------------------------------------------------------*/
 	
 	
 	/* Generate a random number between min and max.  This is a helper for nextReferencePage */
@@ -313,24 +316,29 @@ public class PagingSwapping implements Runnable{
 	}
 	 
 	/*helper for nextReferencePage */
-		public int computeTempPgNumForFirstCase(int pnum){
-			int diff = RandomNumberGenerator(-1, 1);
-			if(pnum ==0 && diff>0){
-				pnum += diff;
-			}
-			else if(pnum > 0){
-				pnum += diff;
-			}
+		public int computeTempPgNumForFirstCase(int pnum, int maxNum){
+			do{
+				int diff = RandomNumberGenerator(-1, 1);
+				if(pnum ==0 && diff>0){
+					pnum = diff;
+				}
+				else if(pnum > 0){
+					pnum += diff;
+				}
+			}while(pnum > maxNum);
 			return pnum;
 		}
 		
-		public int computeTempPgNumForSecondCase(int pgNu){
-			if(pgNu <= 2){
-				pgNu= RandomNumberGenerator(pgNu+2, 10);
-			}
-			else{
-				pgNu = RandomNumberGenerator(0, pgNu-2);
-			}
+		/*helper for nextReferencePage */
+		public int computeTempPgNumForSecondCase(int pgNu, int maxNu){
+			do{
+				if(pgNu <= 2){
+					pgNu= RandomNumberGenerator(pgNu+2, 10);
+				}
+				else{
+					pgNu = RandomNumberGenerator(0, pgNu-2);
+				}
+			}while(pgNu > maxNu);
 			return pgNu;
 		}
 		
@@ -350,7 +358,7 @@ public class PagingSwapping implements Runnable{
 	
 	public void printColTittle(){
 		System.out.println("\nTime-stamp	  Process name		       Page-referenced		Page-in-memory"
-							+ "			   Page-evicted\n");
+							+ "			   Process/Page-evicted\n");
 	}
 	
 	
@@ -384,25 +392,22 @@ public class PagingSwapping implements Runnable{
 		
 	}
 	
-	public LinkedList<Page> random() {
+	public LinkedList<Page> Random() {
 		/*steal 1 page for process to continue*/
-		LinkedList<Page> evictPgProc = new LinkedList<>();
-		int rand = RandomNumberGenerator(1, allProcessPages.size()-1);
-		evictPgProc.add(allProcessPages.get(rand));
+		int rand = RandomNumberGenerator(0, allProcessPages.size()-1);
+		evictItemList.add(allProcessPages.get(rand));
+		/*remove a page from memory (allProcessPages list)*/
 		allProcessPages.remove(rand);
+		
+		/*remove a page from memory (procPageInMem list) */
 		for(int i=0; i<procPageInMem.size(); i++){
-			if(procPageInMem.get(i).getProcName().equals(evictPgProc.get(0).getProcName()) 
-					&& procPageInMem.get(i).getPageNumber() == evictPgProc.get(0).getPageNumber()){
+			if(procPageInMem.get(i).getProcName().equals(evictItemList.get(0).getProcName()) 
+					&& procPageInMem.get(i).getPageNumber() == evictItemList.get(0).getPageNumber()){
 				procPageInMem.remove(i);
 			}
 		}
-		System.out.println("\nProcess is removed\n");
-		try {
-			Thread.sleep(100);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		return evictPgProc;
+		
+		return evictItemList; //return an evicted page
 	}
 	
 }

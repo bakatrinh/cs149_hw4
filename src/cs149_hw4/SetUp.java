@@ -1,4 +1,4 @@
-package cs149_hw4;
+package cs149_homework4;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,7 +15,6 @@ public class SetUp {
 	LinkedList<Process> pcessList = new LinkedList<>();//list of all processes with name,pagesize,arrtime,serviceduration
 	List<Integer>tempRandomProcessList = new ArrayList<>();
 	LinkedList<Integer> freePgList = new LinkedList<>();//Free Page list
-//	LinkedList<Page> process = new LinkedList<>();//to keep track pages in memory for each process
 	
 	
 	/*Generate work load: generate PROCESS_TOTAL processes <process name,Process size in pages,arrival time,service duration>*/
