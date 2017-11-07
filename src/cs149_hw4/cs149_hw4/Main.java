@@ -69,12 +69,13 @@ public class Main {
     
     
 
-    public static void fifo(int menuChoice) {
+    public static void fifo(int menuChoice) throws InterruptedException{
         System.out.println("\n==============================");
         System.out.println("FIFO");
         System.out.println("==============================\n");
 
-        // Your code goes here
+        ProcessSimulation processSimulation = new ProcessSimulation();
+        processSimulation.Simulation(menuChoice);
 
         System.out.println("\n==============================");
         System.out.println("FIFO Done");

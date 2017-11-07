@@ -368,6 +368,19 @@ public class PagingSwapping implements Runnable{
 	}
 	
 	public LinkedList<Page>fifo(){
+		int fifo = getEarliestTimeStamp();
+		evictItemList.add(allProcessPages.get(fifo));
+		/* remove a page from memory (allProcessPage list) */
+		allProcessPages.remove(fifo);
+
+		/*remove pages from memory (procPageInMem list) */
+
+		for (int i = 0; i < procPageInMem.size(); i++) {
+			if (procPageInMem.get(i).getProcName().equals(evictItemList.get(0).getProcName())
+					&& procPageInMem.get(i).getPageNumber() == evictItemList.get(0).getPageNumber())
+				procPageInMem.remove(i);
+		}
+
 		return evictItemList;
 	}
 	
@@ -447,6 +460,18 @@ public class PagingSwapping implements Runnable{
 			if(allProcessPages.get(i).getFreqUse() < lowest){
 				returnPage = i;
 				lowest = allProcessPages.get(i).getFreqUse();
+			}
+		}
+		return returnPage;
+	}
+	
+	public int getEarliestTimeStamp() {
+		int returnPage = 0;
+		double earliest = allProcessPages.get(0).getTimeStampToCompute();
+		for(int i = 1; i< allProcessPages.size(); i++) {
+			if(allProcessPages.get(i).getTimeStampToCompute() > earliest) {
+				returnPage = i;
+				earliest = allProcessPages.get(i).getTimeStampToCompute();
 			}
 		}
 		return returnPage;
