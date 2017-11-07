@@ -381,10 +381,10 @@ public class PagingSwapping implements Runnable{
 	
 	public LinkedList<Page> mfu(){
 		/*steal 1 page for process to continue*/
-		int rand = RandomNumberGenerator(0, allProcessPages.size()-1);
-		evictItemList.add(allProcessPages.get(rand));
+		int mfu = getMfu();
+		evictItemList.add(allProcessPages.get(mfu));
 		/*remove a page from memory (allProcessPages list)*/
-		allProcessPages.remove(rand);
+		allProcessPages.remove(mfu);
 		
 		/*remove a page from memory (procPageInMem list) */
 		for(int i=0; i<procPageInMem.size(); i++){
@@ -413,6 +413,18 @@ public class PagingSwapping implements Runnable{
 		}
 		
 		return evictItemList; //return an evicted page
+	}
+	
+	public int getMfu() {
+		int returnPage = 0;
+		int highest = 0;
+		for(int j=0; j < allProcessPages.size(); j++){ 
+			 if(allProcessPages.get(j).getFreqUse() > highest){
+				 returnPage = j;
+				 highest = allProcessPages.get(j).getFreqUse();
+			 }
+		 }
+		return returnPage;
 	}
 }
 
