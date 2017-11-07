@@ -1,10 +1,6 @@
 package cs149_hw4;
 
 import java.io.IOException;
-import java.io.InterruptedIOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.LinkedList;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
@@ -69,7 +65,7 @@ public class Main {
     
     
 
-    public static void fifo(int menuChoice) throws InterruptedException{
+    public static void fifo(int menuChoice) throws InterruptedException {
         System.out.println("\n==============================");
         System.out.println("FIFO");
         System.out.println("==============================\n");
@@ -87,11 +83,8 @@ public class Main {
         System.out.println("LRU");
         System.out.println("==============================\n");
 
-        // Your code goes here
-        
         ProcessSimulation processSimulation = new ProcessSimulation();
         processSimulation.Simulation(menuChoice);
-
 
         System.out.println("\n==============================");
         System.out.println("LRU Done");
@@ -102,8 +95,6 @@ public class Main {
         System.out.println("\n==============================");
         System.out.println("LFU");
         System.out.println("==============================\n");
-
-        // Your code goes here
 
         ProcessSimulation processSimulation = new ProcessSimulation();
         processSimulation.Simulation(menuChoice);

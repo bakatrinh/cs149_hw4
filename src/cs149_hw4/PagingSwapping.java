@@ -1,7 +1,5 @@
 package cs149_hw4;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.concurrent.locks.ReentrantLock;
@@ -15,6 +13,7 @@ public class PagingSwapping implements Runnable{
 	LinkedList<LinkedList<Page>> allProcessInMemList = new LinkedList<>();//keep all of the above "procPageInMem" list.  
 																			//Use this to call individual "procPageInMem" list
 	LinkedList<Page> evictItemList = new LinkedList<>();
+	ProcessSimulation ps; // reference to outside ProcessSimulation so we can count hits and miss
 	
 	private String procName;
 	private int procSize;
@@ -25,7 +24,7 @@ public class PagingSwapping implements Runnable{
 	private int recentUsed = 0;
 	
 	/*Constructor*/
-	public PagingSwapping(Timer timer){
+	public PagingSwapping(Timer timer, ProcessSimulation ps){
 		SetUp su = new SetUp();
 		processList = su.ProcessSetup();
 		freePageList = su.getFreePageList();
@@ -33,6 +32,7 @@ public class PagingSwapping implements Runnable{
 			freePageList.add(1);  //Initially, there are 100 pages
 		}
 		this.timer = timer;
+		this.ps = ps;
 		isEvicted=0;
 		System.out.println("\nTry");
 	}
@@ -183,6 +183,12 @@ public class PagingSwapping implements Runnable{
 				while(yes ==1){//while page already in mem
 					pgNumTemp = computeTempPgNumForFirstCase(pgNumTemp,size);
 					yes = isPageInMem(pgNumTemp, prcName, evictP, time);
+					if (yes == 1) {
+						ps.incrementHit();
+					}
+					else {
+						ps.incrementMiss();
+					}
 				}
 				pgNum = pgNumTemp;
 			}
@@ -190,6 +196,12 @@ public class PagingSwapping implements Runnable{
 				while(yes==1){//while page is already in mem
 					pgNumTemp = computeTempPgNumForSecondCase(pgNumTemp, size);
 					yes = isPageInMem(pgNumTemp, prcName, evictP, time);
+					if (yes == 1) {
+						ps.incrementHit();
+					}
+					else {
+						ps.incrementMiss();
+					}
 				}
 				pgNum = pgNumTemp;			 
 			}
