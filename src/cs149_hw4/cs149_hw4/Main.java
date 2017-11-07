@@ -1,6 +1,7 @@
 package cs149_hw4;
 
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
@@ -92,12 +93,15 @@ public class Main {
         System.out.println("==============================\n");
     }
 
-    public static void lfu(int menuChoice) {
+    public static void lfu(int menuChoice) throws InterruptedException {
         System.out.println("\n==============================");
         System.out.println("LFU");
         System.out.println("==============================\n");
 
         // Your code goes here
+
+        ProcessSimulation processSimulation = new ProcessSimulation();
+        processSimulation.Simulation(menuChoice);
 
         System.out.println("\n==============================");
         System.out.println("LFU Done");

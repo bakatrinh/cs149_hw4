@@ -375,7 +375,20 @@ public class PagingSwapping implements Runnable{
 		return evictItemList;
 	}
 	
-	public LinkedList<Page> lfu(){
+	private LinkedList<Page> lfu(){
+		int lfu = getLeastFrequentlyUsed();
+		evictItemList.add(allProcessPages.get(lfu));
+		/* remove a page from memory (allProcessPage list) */
+		allProcessPages.remove(lfu);
+
+		/*remove pages from memory (procPageInMem list) */
+
+		for (int i = 0; i < procPageInMem.size(); i++) {
+			if (procPageInMem.get(i).getProcName().equals(evictItemList.get(0).getProcName())
+					&& procPageInMem.get(i).getPageNumber() == evictItemList.get(0).getPageNumber())
+				procPageInMem.remove(i);
+		}
+
 		return evictItemList;
 	}
 	
@@ -424,6 +437,18 @@ public class PagingSwapping implements Runnable{
 				 highest = allProcessPages.get(j).getFreqUse();
 			 }
 		 }
+		return returnPage;
+	}
+
+	private int getLeastFrequentlyUsed() {
+		int returnPage = 0;
+		int lowest = allProcessPages.get(0).getFreqUse();
+		for(int i = 0; i < allProcessPages.size(); i++){
+			if(allProcessPages.get(i).getFreqUse() < lowest){
+				returnPage = i;
+				lowest = allProcessPages.get(i).getFreqUse();
+			}
+		}
 		return returnPage;
 	}
 }
