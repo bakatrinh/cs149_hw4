@@ -1,6 +1,5 @@
 package cs149_hw4;
 
-import java.util.LinkedList;
 
 public class Page {
 	private int pgNumber;
@@ -11,6 +10,7 @@ public class Page {
 	private long timeStampToCompute;
 	private int freqUse;
 	private int recentlyUse;
+	
 	
 	/*Constructors*/
 	
@@ -28,12 +28,16 @@ public class Page {
 		processName = prName;
 	}
 	
-	public Page(String pname, int pNum, String tstamp, long timeComp, int fUse){
+	public Page(String pname, int pNum, String tstamp, long timeComp, int fUse, int size, int dur){
 		processName = pname;
 		pgNumber=pNum;
 		timeStamp = tstamp;
 		timeStampToCompute = timeComp;
 		freqUse = fUse;
+		processSize = size;
+		ServiceDuration = dur;
+		
+		
 //		recentlyUse = rUse;
 	}
 	

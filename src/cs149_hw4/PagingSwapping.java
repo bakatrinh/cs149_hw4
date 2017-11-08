@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.Random;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class PagingSwapping implements Runnable{	
+public class PagingSwapping implements Runnable{
 	final ReentrantLock lock = new ReentrantLock();
 	LinkedList<Process> processList = new LinkedList<>();//List of all process<ProcessName,ProcessPage,ArrivalTime,ServiceDuration
 	LinkedList<Page> allProcessPages = new LinkedList<>();//keep track all pages of all processes globally
@@ -34,7 +34,6 @@ public class PagingSwapping implements Runnable{
 		this.timer = timer;
 		this.ps = ps;
 		isEvicted=0;
-		System.out.println("\nTry");
 	}
 	
 	
@@ -89,7 +88,7 @@ public class PagingSwapping implements Runnable{
 				String pEvict1 = evictItemList.getLast().getProcName();
 				int pEvict2 = evictItemList.getLast().getPageNumber();
 				String pEvict = pEvict1 +"/"+ String.valueOf(pEvict2);
-				printContent(timeStamp, procName, pageNum, pageNum, pEvict);
+				printContent(timeStamp, procName, pageNum, pageNum, pEvict, procSize, serDuration);
 				
 				/*first time process runs, subtract 1 page from freePageList*/
 				updateFreePageList("-");
@@ -147,7 +146,7 @@ public class PagingSwapping implements Runnable{
 							
 							//add a new page number to the global "all process" list
 							 addNewPageToAllProcessPageList(prName,pageInMem, getTimeStampToPrint(),
-														getTimeStampToCompute()); 
+														getTimeStampToCompute(), prSize, serDuration); 
 							 isEvicted = 0;
 							 pageCount++;
 							 /*Get time for the next page*/
@@ -251,9 +250,9 @@ public class PagingSwapping implements Runnable{
 		procPageInMem.add(new Page(prNa, pgInMem, prSize, serDu));	
 	}
 	
-	public void addNewPageToAllProcessPageList(String prcsName, int pgNum, String time, long timeCompu){
+	public void addNewPageToAllProcessPageList(String prcsName, int pgNum, String time, long timeCompu, int pageSize, int ser){
 		int freqUse = 1;	
-		allProcessPages.add(new Page(prcsName, pgNum, time, timeCompu, freqUse));
+		allProcessPages.add(new Page(prcsName, pgNum, time, timeCompu, freqUse, pageSize, ser));
 	}
 	
 	 /* if page is in memory, return 1, otherwise return 0*/
@@ -267,7 +266,7 @@ public class PagingSwapping implements Runnable{
 					 String pEvict1 = pEvict.getLast().getProcName();
 					 int pEvict2 = pEvict.getLast().getPageNumber();
 					 String ev = pEvict1 +"/"+ String.valueOf(pEvict2);
-					 printContent(time, prName, pgNum, allProcessPages.get(i).getPageNumber(), ev);
+					 printContent(time, prName, pgNum, allProcessPages.get(i).getPageNumber(), ev, allProcessPages.get(i).getProcSize(), allProcessPages.get(i).getServiceDuration());
 				 }
 			 }//end of loop of i
 			 
@@ -277,7 +276,8 @@ public class PagingSwapping implements Runnable{
 					 /*Update "frequency use" so it can be used in lfu() and mfu() */
 					 int freqUsage = allProcessPages.get(j).getFreqUse() +1 ;		 
 					 temp.add(new Page(allProcessPages.get(j).getProcName(),allProcessPages.get(j).getPageNumber(),
-							 allProcessPages.get(j).getTimeStamp(),allProcessPages.get(j).getTimeStampToCompute(),freqUsage));				
+							 allProcessPages.get(j).getTimeStamp(),allProcessPages.get(j).getTimeStampToCompute(),freqUsage,
+							 allProcessPages.get(j).getProcSize(), allProcessPages.get(j).getServiceDuration()));				
 					 allProcessPages.set(j,temp.poll());
 					 
 					 return 1; //page is in memory
@@ -364,14 +364,14 @@ public class PagingSwapping implements Runnable{
 	}
 	
 	public void printColTittle(){
-		System.out.println("\nTimestamp	  Process name		       Page-referenced		Page-in-memory"
-							+ "			   Process/Page-evicted\n");
+		System.out.println("\nTimestamp Process name\tPage-referenced\tPage-in-memory"
+							+ "\tProcess/Page-evicted\tPgSize\tDuration\t\tMemory-Map\n");
 	}
 	
 	
-	public void printContent(String timeStamp, String prName, int pgRef, int pgInMem, String pEvict){
-		System.out.println(timeStamp+"			"+prName+"				"+pgRef+"			"+pgInMem+"				"
-							+pEvict+"				");
+	public void printContent(String timeStamp, String prName, int pgRef, int pgInMem, String pEvict, int size, int duration){
+		System.out.println(timeStamp+"\t\t"+prName+"\t\t"+pgRef+"	\t"+pgInMem+"\t\t"
+							+pEvict+"\t\t"+size+"\t"+duration+"\t"+printMemoryMap());
 	}
 	
 	
@@ -392,8 +392,8 @@ public class PagingSwapping implements Runnable{
 		/*remove pages from memory (procPageInMem list) */
 
 		for (int i = 0; i < procPageInMem.size(); i++) {
-			if (procPageInMem.get(i).getProcName().equals(evictItemList.get(0).getProcName())
-					&& procPageInMem.get(i).getPageNumber() == evictItemList.get(0).getPageNumber())
+			if (procPageInMem.get(i).getProcName().equals(evictItemList.getLast().getProcName())
+					&& procPageInMem.get(i).getPageNumber() == evictItemList.getLast().getPageNumber())
 				procPageInMem.remove(i);
 		}
 
@@ -411,8 +411,8 @@ public class PagingSwapping implements Runnable{
 			}
 		}
 		for (int i = 0; i < procPageInMem.size(); i++) {
-			if (procPageInMem.get(i).getProcName().equals(evictItemList.get(0).getProcName())
-					&& procPageInMem.get(i).getPageNumber() == evictItemList.get(0).getPageNumber())
+			if (procPageInMem.get(i).getProcName().equals(evictItemList.getLast().getProcName())
+					&& procPageInMem.get(i).getPageNumber() == evictItemList.getLast().getPageNumber())
 				procPageInMem.remove(i);
 		}
 		return evictItemList;
@@ -427,8 +427,8 @@ public class PagingSwapping implements Runnable{
 		/*remove pages from memory (procPageInMem list) */
 
 		for (int i = 0; i < procPageInMem.size(); i++) {
-			if (procPageInMem.get(i).getProcName().equals(evictItemList.get(0).getProcName())
-					&& procPageInMem.get(i).getPageNumber() == evictItemList.get(0).getPageNumber())
+			if (procPageInMem.get(i).getProcName().equals(evictItemList.getLast().getProcName())
+					&& procPageInMem.get(i).getPageNumber() == evictItemList.getLast().getPageNumber())
 				procPageInMem.remove(i);
 		}
 
@@ -444,8 +444,8 @@ public class PagingSwapping implements Runnable{
 		
 		/*remove a page from memory (procPageInMem list) */
 		for(int i=0; i<procPageInMem.size(); i++){
-			if(procPageInMem.get(i).getProcName().equals(evictItemList.get(0).getProcName()) 
-					&& procPageInMem.get(i).getPageNumber() == evictItemList.get(0).getPageNumber()){
+			if(procPageInMem.get(i).getProcName().equals(evictItemList.getLast().getProcName()) 
+					&& procPageInMem.get(i).getPageNumber() == evictItemList.getLast().getPageNumber()){
 				procPageInMem.remove(i);
 			}
 		}
@@ -462,8 +462,8 @@ public class PagingSwapping implements Runnable{
 		
 		/*remove a page from memory (procPageInMem list) */
 		for(int i=0; i<procPageInMem.size(); i++){
-			if(procPageInMem.get(i).getProcName().equals(evictItemList.get(0).getProcName()) 
-					&& procPageInMem.get(i).getPageNumber() == evictItemList.get(0).getPageNumber()){
+			if(procPageInMem.get(i).getProcName().equals(evictItemList.getLast().getProcName()) 
+					&& procPageInMem.get(i).getPageNumber() == evictItemList.getLast().getPageNumber()){
 				procPageInMem.remove(i);
 			}
 		}
@@ -485,7 +485,7 @@ public class PagingSwapping implements Runnable{
 
 	private int getLeastFrequentlyUsed() {
 		int returnPage = 0;
-		int lowest = allProcessPages.get(0).getFreqUse();
+		int lowest = allProcessPages.getLast().getFreqUse();
 		for(int i = 0; i < allProcessPages.size(); i++){
 			if(allProcessPages.get(i).getFreqUse() < lowest){
 				returnPage = i;
@@ -497,7 +497,7 @@ public class PagingSwapping implements Runnable{
 	
 	public int getEarliestTimeStamp() {
 		int returnPage = 0;
-		double earliest = allProcessPages.get(0).getTimeStampToCompute();
+		double earliest = allProcessPages.getLast().getTimeStampToCompute();
 		for(int i = 1; i< allProcessPages.size(); i++) {
 			if(allProcessPages.get(i).getTimeStampToCompute() > earliest) {
 				returnPage = i;
@@ -506,7 +506,19 @@ public class PagingSwapping implements Runnable{
 		}
 		return returnPage;
 	}
+	
+	public String printMemoryMap() {
+		String returnString = "";
+		returnString += "<";
+		for (Page p : allProcessPages) {
+			if (p.getProcName() == null || p.getProcName().isEmpty() || p.getProcName().equals("") || p.getProcName().equals(" ")) {
+				returnString += ".";
+			}
+			else {
+				returnString += p.getProcName();
+			}
+		}
+		returnString += ">";
+		return returnString;
+	}
 }
-
-
-

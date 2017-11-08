@@ -11,7 +11,7 @@ public class ProcessSimulation {
 	int[] hitMissTracker; // index 0 is hit, index 1 is miss
 	double hitMissRatioTotal;
 	ArrayList<int[]> hitMissTrackerRun;
-	static final int runTracker = 2;
+	static final int runTracker = 5;
 
 	public void Simulation(int menuChoice) throws InterruptedException {
 		
